@@ -54,4 +54,4 @@ class Descriminator(tnn.Module):
         )
     
     def forward(self, inp):
-        return self.main_net(inp)
+        return self.main_net(inp).view(-1, 1).squeeze(1)
