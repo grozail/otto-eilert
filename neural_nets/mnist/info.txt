@@ -1,0 +1,1 @@
+{"X_train type": "<class 'numpy.ndarray'>"}{"X_train shape": "(60000, 28, 28, 1)"}
