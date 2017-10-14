@@ -111,3 +111,6 @@ venv.bak/
 Будет удалено .idea/workspace.xml
 Будет удалено neural_nets/givemeagan/data/output/
 Будет удалено neural_nets/givemeagan/docs/
+/.idea/
+/.idea/*
+/.idea/machine-learning.iml
