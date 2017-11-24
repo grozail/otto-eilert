@@ -1,6 +1,5 @@
 import torch
 import torch.nn as tnn
-
 import torch.optim as optim
 import torch.utils.data
 import torchvision.datasets
@@ -9,10 +8,11 @@ from torch.autograd import Variable
 
 # ===================== GENERATOR =========================
 class Generator(tnn.Module):
-    def __init__(self, noise_size, n_classes, n_features):
+    
+    def __init__(self, noise_size, n_features):
         super(Generator, self).__init__()
         self.main_net = tnn.Sequential(
-            tnn.ConvTranspose2d(noise_size + n_classes, n_features * 4, 4, 1, 0, bias=False),
+            tnn.ConvTranspose2d(noise_size, n_features * 4, 4, 1, 0, bias=False),
             tnn.BatchNorm2d(n_features * 4),
             tnn.ReLU(True),
             # n_features* 4 x 4 x 4
@@ -28,12 +28,15 @@ class Generator(tnn.Module):
             # 1 x 32 x 32
             tnn.Tanh(),
         )
+        self.main_net.apply(weights_init)
         
     def forward(self, inp):
         return self.main_net(inp)
 
 
+# ===================== DESCRIMINATOR =========================
 class Descriminator(tnn.Module):
+    
     def __init__(self, n_features):
         super(Descriminator, self).__init__()
         self.main_net = tnn.Sequential(
@@ -52,6 +55,16 @@ class Descriminator(tnn.Module):
             tnn.Conv2d(n_features * 4, 1, 4, 1, 0, bias=False),
             tnn.Sigmoid(),
         )
+        self.main_net.apply(weights_init)
     
     def forward(self, inp):
-        return self.main_net(inp).view(-1, 1).squeeze(1)
+        return self.main_net(inp)
+
+
+def weights_init(m):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        m.weight.data.normal_(0.0, 0.02)
+    elif classname.find('BatchNorm') != -1:
+        m.weight.data.normal_(1.0, 0.02)
+        m.bias.data.fill_(0)

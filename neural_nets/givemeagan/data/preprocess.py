@@ -55,7 +55,7 @@ def transfer_images_to_small():
         print(cdir_basename)
         for filename in files:
             if filename.endswith('.png'):
-                processed = image_transform(os.path.join(cdir, filename), (40, 40))
+                processed = image_transform(os.path.join(cdir, filename), (32, 32))
                 cv.imwrite(os.path.join(small_root, cdir_basename, filename), img=processed)
   
             
