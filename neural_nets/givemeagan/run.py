@@ -7,7 +7,7 @@ parser.add_argument('--image_size', type=int, default=32, help='input image size
 parser.add_argument('--nz', type=int, default=100, help='size of the noise')
 parser.add_argument('--ngf', type=int, default=64, help='number of generator filters')
 parser.add_argument('--ndf', type=int, default=64, help='number of descriminator filters')
-parser.add_argument('--epoch', type=int, default=4, help='number of train epochs')
+parser.add_argument('--epoch', type=int, default=10, help='number of train epochs')
 parser.add_argument('--lr', type=float, default=0.005, help='learning rate, default=0.0002')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
 parser.add_argument('--random_seed', type=int, default=666, help='manual seed')
@@ -88,53 +88,56 @@ def train():
     
     for epoch in range(epochs):
         for i, data in enumerate(dataloader):
-            real_cpu, ids = data
-            current_batch_size = real_cpu.size(0)
-            if cla.cuda and torch.cuda.is_available():
-                real_cpu = real_cpu.cuda()
+            try:
+                real_cpu, ids = data
+                current_batch_size = real_cpu.size(0)
+                if cla.cuda and torch.cuda.is_available():
+                    real_cpu = real_cpu.cuda()
+        
+                    # feed D with real
+                D.zero_grad()
+                inp.resize_as_(real_cpu).copy_(real_cpu)
+                label.resize_((current_batch_size, 1, 1, 1)).fill_(real_label)
+                var_inp = Variable(inp)
+                var_label = Variable(label)
+                output = D(var_inp)
+                err_D_real = criterion(output, var_label)
+                err_D_real.backward()
+                D_x = output.data.mean()
     
-            # feed D with real
-            D.zero_grad()
-            inp.resize_as_(real_cpu).copy_(real_cpu)
-            label.resize_((current_batch_size, 1, 1, 1)).fill_(real_label)
-            var_inp = Variable(inp)
-            var_label = Variable(label)
-            output = D(var_inp)
-            err_D_real = criterion(output, var_label)
-            err_D_real.backward()
-            D_x = output.data.mean()
-
-            # generate fake image from random noise
-            noise.resize_(batch_size, noize_size, 1, 1).normal_(0, 1)
-            var_noise = Variable(noise)
-            fake = G(var_noise)
-
-            # feed D with fake
-            var_label = Variable(label.fill_(fake_label))
-            output = D(fake.detach())
-            err_D_fake = criterion(output, var_label)
-            err_D_fake.backward()
-            D_G_z1 = output.data.mean()
-            err_D = err_D_fake + err_D_real
-            opt_D.step()
-
-            # update G
-            G.zero_grad()
-            var_label = Variable(label.fill_(real_label))
-            output = D(fake)
-            err_G = criterion(output, var_label)
-            err_G.backward()
-            D_G_z2 = output.data.mean()
-            opt_G.step()
-
-            print('[%d/%d][%d/%d] Loss_D: %.4f Loss_G: %.4f D(x): %.4f D(G(z)): %.4f / %.4f'
-                  % (epoch, cla.epoch, i, len(dataloader),
-                     err_D.data[0], err_G.data[0], D_x, D_G_z1, D_G_z2))
-            if i % 100 == 0:
-                visutils.save_image(real_cpu,
-                                    '/opt/ProjectsPy/machine-learning/neural_nets/givemeagan/data/output/real_samples-e{}-b{}.png'.format(epoch, i),
-                                    normalize=True)
-                fake = G(fixed_noise)
-                visutils.save_image(fake.data,
-                                    '/opt/ProjectsPy/machine-learning/neural_nets/givemeagan/data/output/fake_samples-e{}-b{}.png'.format(epoch, i),
-                                    normalize=True)
+                # generate fake image from random noise
+                noise.resize_(batch_size, noize_size, 1, 1).normal_(0, 1)
+                var_noise = Variable(noise)
+                fake = G(var_noise)
+    
+                # feed D with fake
+                var_label = Variable(label.fill_(fake_label))
+                output = D(fake.detach())
+                err_D_fake = criterion(output, var_label)
+                err_D_fake.backward()
+                D_G_z1 = output.data.mean()
+                err_D = err_D_fake + err_D_real
+                opt_D.step()
+    
+                # update G
+                G.zero_grad()
+                var_label = Variable(label.fill_(real_label))
+                output = D(fake)
+                err_G = criterion(output, var_label)
+                err_G.backward()
+                D_G_z2 = output.data.mean()
+                opt_G.step()
+    
+                print('[%d/%d][%d/%d] Loss_D: %.4f Loss_G: %.4f D(x): %.4f D(G(z)): %.4f / %.4f'
+                      % (epoch, cla.epoch, i, len(dataloader),
+                         err_D.data[0], err_G.data[0], D_x, D_G_z1, D_G_z2))
+                if i % 100 == 0:
+                    visutils.save_image(real_cpu,
+                                        '/opt/ProjectsPy/machine-learning/neural_nets/givemeagan/data/output/real_samples-e{}-b{}.png'.format(epoch, i),
+                                        normalize=True)
+                    fake = G(fixed_noise)
+                    visutils.save_image(fake.data,
+                                        '/opt/ProjectsPy/machine-learning/neural_nets/givemeagan/data/output/fake_samples-e{}-b{}.png'.format(epoch, i),
+                                        normalize=True)
+            except:
+                pass
