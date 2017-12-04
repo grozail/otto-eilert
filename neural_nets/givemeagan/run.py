@@ -55,7 +55,7 @@ def train():
                                                transforms.ToTensor(),
                                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                                            ]))
-    dataloader = torch.utils.data.DataLoader(cyrilic_dataset, batch_size, shuffle=True, num_workers=2)
+    dataloader = torch.utils.data.DataLoader(cyrilic_dataset, batch_size, shuffle=True, num_workers=1)
     
     n_descriminator_features = int(cla.ndf)
     D = Descriminator(n_descriminator_features)
