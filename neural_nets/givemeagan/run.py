@@ -133,11 +133,11 @@ def train():
                          err_D.data[0], err_G.data[0], D_x, D_G_z1, D_G_z2))
                 if i % 100 == 0:
                     visutils.save_image(real_cpu,
-                                        '/opt/ProjectsPy/machine-learning/neural_nets/givemeagan/data/output/real_samples-e{}-b{}.png'.format(epoch, i),
+                                        'neural_nets/givemeagan/data/output/real_samples-e{}-b{}.png'.format(epoch, i),
                                         normalize=True)
                     fake = G(fixed_noise)
                     visutils.save_image(fake.data,
-                                        '/opt/ProjectsPy/machine-learning/neural_nets/givemeagan/data/output/fake_samples-e{}-b{}.png'.format(epoch, i),
+                                        'neural_nets/givemeagan/data/output/fake_samples-e{}-b{}.png'.format(epoch, i),
                                         normalize=True)
             except:
                 pass
