@@ -50,7 +50,7 @@ def train():
         data = channels[0] / 255.0
         return Image.fromarray(data, "F")
     
-    cyrilic_dataset = datasets.ImageFolder(root='/opt/ProjectsPy/0_DATASETS/Cyrillic-small',
+    cyrilic_dataset = datasets.ImageFolder(root='neural_nets/givemeagan/data/dataset/Cyrillic-small',
                                            transform=transforms.Compose([
                                                transforms.ToTensor(),
                                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
