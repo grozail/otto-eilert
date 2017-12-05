@@ -9,6 +9,8 @@ parser.add_argument('--ngf', type=int, default=64, help='number of generator fea
 parser.add_argument('--ndf', type=int, default=64, help='number of descriminator features')
 parser.add_argument('--epoch', type=int, default=10, help='number of train epochs')
 parser.add_argument('--lr', type=float, default=0.005, help='learning rate, default=0.005')
+parser.add_argument('--beta_g', type=float, default=0.9, help='beta for generator adam')
+parser.add_argument('--beta_d', type=float, default=0.9, help='beta for descriminator adam')
 # parser.add_argument('--cuda', action='store_true', help='enables cuda')
 parser.add_argument('--random_seed', type=int, default=666, help='manual seed')
 
@@ -69,7 +71,7 @@ class Generator(nn.Module):
         if CUDA:
             self.GENERATOR.cuda()
             self.fixed_noise = Variable(self.fixed_noise.cuda())
-        self.optimizer = optim.Adam(self.GENERATOR.parameters(), float(args.lr), betas=(0.9, 0.999))
+        self.optimizer = optim.Adam(self.GENERATOR.parameters(), float(args.lr), betas=(float(args.beta_g), 0.999))
         self.GENERATOR.train()
         
     def forward(self, inp):
@@ -120,7 +122,7 @@ class Descriminator(nn.Module):
         self.DESCRIMINATOR.apply(weights_init)
         if CUDA:
             self.DESCRIMINATOR.cuda()
-        self.optimizer = optim.Adam(self.DESCRIMINATOR.parameters(), float(args.lr), betas=(0.9, 0.999))
+        self.optimizer = optim.Adam(self.DESCRIMINATOR.parameters(), float(args.lr), betas=(float(args.beta_d), 0.999))
         self.DESCRIMINATOR.train()
     
     def forward(self, inp):
