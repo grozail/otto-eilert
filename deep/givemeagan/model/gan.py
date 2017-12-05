@@ -166,9 +166,6 @@ class HaakonGAN:
             torch.cuda.manual_seed(random_seed)
         self.G = Generator()
         self.D = Descriminator()
-        if CUDA:
-            self.G.cuda()
-            self.D.cuda()
     
     def train(self):
         for epoch in range(1, int(args.epoch)):
