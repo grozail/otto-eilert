@@ -6,7 +6,7 @@ import cv2 as cv
 
 raw_data_root = '/opt/ProjectsPy/0_DATASETS/Cyrillic/'
 small_root = '/opt/ProjectsPy/0_DATASETS/Cyrillic-small/'
-target_path = '/opt/ProjectsPy/machine-learning/neural_nets/givemeagan/data/dataset/'
+target_path = '/opt/ProjectsPy/machine-learning/deep/givemeagan/data/dataset/'
 
 
 def rename():

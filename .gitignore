@@ -114,4 +114,4 @@ venv.bak/
 /.idea/
 /.idea/*
 /.idea/machine-learning.iml
-neural_nets/givemeagan/data/output
+deep/givemeagan/data/output

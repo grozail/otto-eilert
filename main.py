@@ -1,4 +1,5 @@
-import neural_nets.givemeagan.run as ganrun
+from deep.givemeagan.model.gan import HaakonGAN
 
 if __name__ == '__main__':
-    ganrun.train()
+    gan = HaakonGAN()
+    gan.train()

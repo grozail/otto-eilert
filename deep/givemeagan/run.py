@@ -50,7 +50,7 @@ def train():
         data = channels[0] / 255.0
         return Image.fromarray(data, "F")
     
-    cyrilic_dataset = datasets.ImageFolder(root='neural_nets/givemeagan/data/dataset/Cyrillic-small',
+    cyrilic_dataset = datasets.ImageFolder(root='deep/givemeagan/data/dataset/Cyrillic-small',
                                            transform=transforms.Compose([
                                                transforms.ToTensor(),
                                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
@@ -133,11 +133,11 @@ def train():
                          err_D.data[0], err_G.data[0], D_x, D_G_z1, D_G_z2))
                 if i % 100 == 0:
                     visutils.save_image(real_cpu,
-                                        'neural_nets/givemeagan/data/output/real_samples-e{}-b{}.png'.format(epoch, i),
+                                        'deep/givemeagan/data/output/real_samples-e{}-b{}.png'.format(epoch, i),
                                         normalize=True)
                     fake = G(fixed_noise)
                     visutils.save_image(fake.data,
-                                        'neural_nets/givemeagan/data/output/fake_samples-e{}-b{}.png'.format(epoch, i),
+                                        'deep/givemeagan/data/output/fake_samples-e{}-b{}.png'.format(epoch, i),
                                         normalize=True)
             except:
                 pass
