@@ -23,6 +23,7 @@ import torch.cuda
 from torch.autograd import Variable
 import torchvision.utils as visutils
 
+import time
 import random
 
 CUDA = torch.cuda.is_available()
@@ -101,7 +102,7 @@ class Descriminator(nn.Module):
         super(Descriminator, self).__init__()
         n_features = int(args.ngf)
         self.DESCRIMINATOR = nn.Sequential(
-            # input signals 1 x 32 x 32
+            # input signals 3 x 32 x 32
             nn.Conv2d(3, n_features, 4, 2, 1, bias=False),
             nn.LeakyReLU(0.1, True),
             # n_features x 16 x 16
@@ -168,6 +169,7 @@ class HaakonGAN:
         self.D = Descriminator()
     
     def train(self):
+        start = time.time()
         for epoch in range(1, int(args.epoch)):
             for i, (x, label) in enumerate(dataloader):
                 sample, probability_generated_is_real, generation_error = self.G.train_iteration(x, self.D)
@@ -177,10 +179,9 @@ class HaakonGAN:
                               descrimination_error.data[0], generation_error.data[0],
                               probability_real_is_real, p_fake_is_real, probability_generated_is_real))
                 if i % 100 == 0:
-                    visutils.save_image(x,
-                                        'deep/givemeagan/data/output/real_samples-e{}-b{}.png'.format(epoch, i),
-                                        normalize=True)
                     fake = self.G.gen_fixed()
                     visutils.save_image(fake.data,
                                         'deep/givemeagan/data/output/fake_samples-e{}-b{}.png'.format(epoch, i),
                                         normalize=True)
+        training_time = time.time() - start()
+        print('Training time: ', training_time//60, ' min ', training_time - (training_time//60) * 60, ' sec')
