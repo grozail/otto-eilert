@@ -44,8 +44,8 @@ class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
         self.noise_size = int(args.nz)
-        self.fixed_noise = torch.FloatTensor(int(args.batch_size)).normal_(0, 1)
         noise_size = self.noise_size
+        self.fixed_noise = torch.FloatTensor(int(args.batch_size), noise_size, 1, 1).normal_(0, 1)
         n_features = int(args.ngf)
         self.GENERATOR = nn.Sequential(
             nn.ConvTranspose2d(noise_size, n_features * 4, 4, 1, 0, bias=False),
