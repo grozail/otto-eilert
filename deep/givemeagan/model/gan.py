@@ -185,5 +185,5 @@ class HaakonGAN:
                     visutils.save_image(fake.data,
                                         'deep/givemeagan/data/output/fake_samples-e{}-b{}.png'.format(epoch, i),
                                         normalize=True)
-        training_time = time.time() - start()
+        training_time = time.time() - start
         print('Training time: ', training_time//60, ' min ', training_time - (training_time//60) * 60, ' sec')
