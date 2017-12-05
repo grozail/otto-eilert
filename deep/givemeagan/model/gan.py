@@ -44,7 +44,7 @@ class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
         self.noise_size = int(args.nz)
-        self.fixed_noise = Variable(torch.FloatTensor(int(args.batch_size)).normal_(0, 1))
+        self.fixed_noise = torch.FloatTensor(int(args.batch_size)).normal_(0, 1)
         noise_size = self.noise_size
         n_features = int(args.ngf)
         self.GENERATOR = nn.Sequential(
@@ -67,7 +67,7 @@ class Generator(nn.Module):
         self.GENERATOR.apply(weights_init)
         if CUDA:
             self.GENERATOR.cuda()
-            self.fixed_noise.cuda()
+            self.fixed_noise = Variable(self.fixed_noise.cuda())
         self.optimizer = optim.Adam(self.GENERATOR.parameters(), float(args.lr), betas=(0.9, 0.999))
         self.GENERATOR.train()
         
@@ -168,6 +168,9 @@ class HaakonGAN:
             torch.cuda.manual_seed(random_seed)
         self.G = Generator()
         self.D = Descriminator()
+        if CUDA:
+            self.G.cuda()
+            self.D.cuda()
     
     def train(self):
         for epoch in range(1, int(args.epoch)):
