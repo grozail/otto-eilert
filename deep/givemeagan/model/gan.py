@@ -176,7 +176,8 @@ class HaakonGAN:
                 sample, probability_generated_is_real, generation_error = self.G.train_iteration(x, self.D)
                 probability_real_is_real, p_fake_is_real, descrimination_error = self.D.train_iteration(x, sample, None)
                 print('[{}/{}][{}/{}] | Loss_D: {:.4f} | Loss_G: {:.4f} | D(x): {:.4f} | D(G(z)): {:.4f} / {:.4f}'
-                      .format(epoch, int(args.epoch), i, len(dataloader), descrimination_error, generation_error,
+                      .format(epoch, int(args.epoch), i, len(dataloader),
+                              descrimination_error.data[0], generation_error.data[0],
                               probability_real_is_real, p_fake_is_real, probability_generated_is_real))
                 if i % 100 == 0:
                     visutils.save_image(x,
