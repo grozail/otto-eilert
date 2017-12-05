@@ -134,7 +134,7 @@ class Descriminator(nn.Module):
         var_inp, var_label = Variable(real_input), Variable(label),
         self.optimizer.zero_grad()
         output = self.DESCRIMINATOR(var_inp)
-        error_on_real = criterion(output, label)
+        error_on_real = criterion(output, var_label)
         error_on_real.backward()
         probability_real_is_real = output.data.mean()
         
