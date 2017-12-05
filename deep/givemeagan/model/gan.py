@@ -79,8 +79,7 @@ class Generator(nn.Module):
         noise = torch.FloatTensor(current_batch_size, self.noise_size, 1, 1).normal_(0, 1)
         label = torch.FloatTensor(current_batch_size, 1, 1, 1).fill_(real_label)
         if CUDA:
-            noise.cuda()
-            label.cuda()
+            noise, label = noise.cuda(), label.cuda()
         var_noise, var_label = Variable(noise), Variable(label)
         self.optimizer.zero_grad()
         fake_sample = self.GENERATOR(var_noise)
@@ -131,8 +130,7 @@ class Descriminator(nn.Module):
         current_batch_size = real_input.size(0)
         label = torch.FloatTensor(current_batch_size, 1, 1, 1).fill_(real_label)
         if CUDA:
-            real_input.cuda()
-            label.cuda()
+            real_input, label = real_input.cuda(), label.cuda()
         var_inp, var_label = Variable(real_input), Variable(label),
         self.optimizer.zero_grad()
         output = self.DESCRIMINATOR(var_inp)
