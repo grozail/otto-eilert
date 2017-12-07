@@ -9,8 +9,8 @@ parser.add_argument('--ngf', type=int, default=64, help='number of generator fea
 parser.add_argument('--ndf', type=int, default=64, help='number of descriminator features')
 parser.add_argument('--epoch', type=int, default=10, help='number of train epochs')
 parser.add_argument('--lr', type=float, default=0.005, help='learning rate, default=0.005')
-parser.add_argument('--beta_g', type=float, default=0.9, help='beta for generator adam')
-parser.add_argument('--beta_d', type=float, default=0.9, help='beta for descriminator adam')
+parser.add_argument('--beta_g', type=float, default=0.5, help='beta for generator adam')
+parser.add_argument('--beta_d', type=float, default=0.5, help='beta for descriminator adam')
 # parser.add_argument('--cuda', action='store_true', help='enables cuda')
 parser.add_argument('--random_seed', type=int, default=666, help='manual seed')
 
@@ -35,12 +35,15 @@ real_label = 1
 fake_label = 0
 criterion = nn.BCELoss()
 
+loss_file = open('deep/givemeagan/data/output/0_loss.txt', 'w')
+
 cyrilic_dataset = datasets.ImageFolder(root='deep/givemeagan/data/dataset/Cyrillic-small',
                                            transform=transforms.Compose([
                                                transforms.ToTensor(),
                                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                                            ]))
 dataloader = torch.utils.data.DataLoader(cyrilic_dataset, int(args.batch_size), shuffle=True, num_workers=1)
+
 # ===================== GENERATOR =========================
 class Generator(nn.Module):
     
@@ -51,14 +54,18 @@ class Generator(nn.Module):
         self.fixed_noise = torch.FloatTensor(int(args.batch_size), noise_size, 1, 1).normal_(0, 1)
         n_features = int(args.ngf)
         self.GENERATOR = nn.Sequential(
-            nn.ConvTranspose2d(noise_size, n_features * 4, 4, 1, 0, bias=False),
+            nn.ConvTranspose2d(noise_size, n_features * 8, 2, 1, 0, bias=False),
+            nn.BatchNorm2d(n_features * 8),
+            nn.ReLU(True),
+            # n_features* 8 x 2 x 2
+            nn.ConvTranspose2d(n_features * 8, n_features * 4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(n_features * 4),
             nn.ReLU(True),
-            # n_features* 4 x 4 x 4
+            # n_features * 4 x 4 x 4
             nn.ConvTranspose2d(n_features * 4, n_features * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(n_features * 2),
             nn.ReLU(True),
-            # n_features * 2 x 8 x 8
+            # n_features x 2 x 8 x 8
             nn.ConvTranspose2d(n_features * 2, n_features, 4, 2, 1, bias=False),
             nn.BatchNorm2d(n_features),
             nn.ReLU(True),
@@ -91,6 +98,7 @@ class Generator(nn.Module):
         generation_error.backward()
         probability_generated_is_real = output.data.mean()
         self.optimizer.step()
+        loss_file.write('{:.4f}'.format(generation_error.data[0]))
         return fake_sample, probability_generated_is_real, generation_error
     
     def gen_fixed(self):
@@ -148,7 +156,7 @@ class Descriminator(nn.Module):
         probability_fake_is_real = output.data.mean()
         full_error = error_on_fake + error_on_real
         self.optimizer.step()
-        
+        loss_file.write('{:.4f}'.format(full_error.data[0]))
         return probability_real_is_real, probability_fake_is_real, full_error
 
 
