@@ -98,7 +98,7 @@ class Generator(nn.Module):
         generation_error.backward()
         probability_generated_is_real = output.data.mean()
         self.optimizer.step()
-        loss_file.write('{:.4f}'.format(generation_error.data[0]))
+        loss_file.write('{:.4f};'.format(generation_error.data[0]))
         return fake_sample, probability_generated_is_real, generation_error
     
     def gen_fixed(self):
@@ -124,7 +124,12 @@ class Descriminator(nn.Module):
             nn.BatchNorm2d(n_features * 4),
             nn.LeakyReLU(0.1, True),
             # n_features * 4 x 4 x 4
-            nn.Conv2d(n_features * 4, 1, 4, 1, 0, bias=False),
+            nn.Conv2d(n_features * 4, n_features * 8, 3, 1, 0, bias=False),
+            nn.BatchNorm2d(n_features * 8),
+            nn.LeakyReLU(0.1, True),
+            
+            nn.Conv2d(n_features * 8, 1, 2, 1, 0, bias=False),
+            
             nn.Sigmoid(),
         )
         self.DESCRIMINATOR.apply(weights_init)
@@ -156,7 +161,9 @@ class Descriminator(nn.Module):
         probability_fake_is_real = output.data.mean()
         full_error = error_on_fake + error_on_real
         self.optimizer.step()
-        loss_file.write('{:.4f}'.format(full_error.data[0]))
+        
+        loss_file.write('{:.4f}\n'.format(full_error.data[0]))
+        
         return probability_real_is_real, probability_fake_is_real, full_error
 
 
@@ -195,3 +202,4 @@ class HaakonGAN:
                                         normalize=True)
         training_time = time.time() - start
         print('Training time: ', training_time//60, ' min ', training_time - (training_time//60) * 60, ' sec')
+        loss_file.close()
