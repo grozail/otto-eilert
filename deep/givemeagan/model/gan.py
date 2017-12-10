@@ -120,6 +120,7 @@ class Descriminator(nn.Module):
             nn.LeakyReLU(0.1, True),
             
             # n_features x 16 x 16
+            nn.Dropout2d(0.3),
             nn.Conv2d(n_features, n_features * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(n_features * 2),
             nn.LeakyReLU(0.1, True),
@@ -131,13 +132,7 @@ class Descriminator(nn.Module):
             nn.LeakyReLU(0.1, True),
             
             # n_features * 4 x 4 x 4
-            nn.Dropout2d(0.3),
-            nn.Conv2d(n_features * 4, n_features * 8, 3, 1, 0, bias=False),
-            nn.BatchNorm2d(n_features * 8),
-            nn.LeakyReLU(0.1, True),
-            
-            nn.Conv2d(n_features * 8, 1, 2, 1, 0, bias=False),
-            
+            nn.Conv2d(n_features * 4, 1, 4, 2, 0, bias=False),
             nn.Sigmoid(),
         )
         self.DESCRIMINATOR.apply(weights_init)
