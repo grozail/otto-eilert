@@ -54,21 +54,21 @@ class Generator(nn.Module):
         self.fixed_noise = torch.FloatTensor(int(args.batch_size), noise_size, 1, 1).normal_(0, 1)
         n_features = int(args.ngf)
         self.GENERATOR = nn.Sequential(
-            nn.ConvTranspose2d(noise_size, n_features * 8, 2, 1, 0, bias=False),
+            nn.ConvTranspose2d(noise_size, n_features * 8, 2, 1, 0, bias=True),
             nn.BatchNorm2d(n_features * 8),
-            nn.ReLU(True),
+            nn.LeakyReLU(0.05, True),
             # n_features* 8 x 2 x 2
             nn.ConvTranspose2d(n_features * 8, n_features * 4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(n_features * 4),
-            nn.ReLU(True),
+            nn.LeakyReLU(0.05, True),
             # n_features * 4 x 4 x 4
-            nn.ConvTranspose2d(n_features * 4, n_features * 2, 4, 2, 1, bias=False),
+            nn.ConvTranspose2d(n_features * 4, n_features * 2, 4, 2, 1, bias=True),
             nn.BatchNorm2d(n_features * 2),
-            nn.ReLU(True),
+            nn.LeakyReLU(0.05, True),
             # n_features x 2 x 8 x 8
             nn.ConvTranspose2d(n_features * 2, n_features, 4, 2, 1, bias=False),
             nn.BatchNorm2d(n_features),
-            nn.ReLU(True),
+            nn.LeakyReLU(0.05, True),
             # n_features x 16 x 16
             nn.ConvTranspose2d(n_features, 3, 4, 2, 1, bias=False),
             # 3 x 32 x 32
@@ -78,7 +78,10 @@ class Generator(nn.Module):
         if CUDA:
             self.GENERATOR.cuda()
             self.fixed_noise = Variable(self.fixed_noise.cuda())
-        self.optimizer = optim.Adam(self.GENERATOR.parameters(), float(args.lr), betas=(float(args.beta_g), 0.999))
+        self.lr = float(args.lr) * 1.5
+        self.beta = float(args.beta_g)
+        print('GENERATOR lr:', self.lr, ' beta: ', self.beta)
+        self.optimizer = optim.Adam(self.GENERATOR.parameters(), self.lr, betas=(self.beta, 0.999))
         self.GENERATOR.train()
         
     def forward(self, inp):
@@ -135,7 +138,10 @@ class Descriminator(nn.Module):
         self.DESCRIMINATOR.apply(weights_init)
         if CUDA:
             self.DESCRIMINATOR.cuda()
-        self.optimizer = optim.Adam(self.DESCRIMINATOR.parameters(), float(args.lr), betas=(float(args.beta_d), 0.999))
+        self.lr = float(args.lr)
+        self.beta = float(args.beta_d)
+        print('DESCRIMINATOR lr:', self.lr, ' beta: ', self.beta)
+        self.optimizer = optim.Adam(self.DESCRIMINATOR.parameters(), self.lr, betas=(self.beta, 0.999))
         self.DESCRIMINATOR.train()
     
     def forward(self, inp):
