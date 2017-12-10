@@ -124,11 +124,11 @@ class Descriminator(nn.Module):
             nn.LeakyReLU(0.1, True),
             # n_features * 2 x 8 x 8
             nn.Conv2d(n_features * 2, n_features * 4, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(n_features * 4),
+            # nn.BatchNorm2d(n_features * 4),
             nn.LeakyReLU(0.1, True),
             # n_features * 4 x 4 x 4
             nn.Conv2d(n_features * 4, n_features * 8, 3, 1, 0, bias=False),
-            nn.BatchNorm2d(n_features * 8),
+            # nn.BatchNorm2d(n_features * 8),
             nn.LeakyReLU(0.1, True),
             
             nn.Conv2d(n_features * 8, 1, 2, 1, 0, bias=False),
