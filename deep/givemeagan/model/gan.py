@@ -56,19 +56,19 @@ class Generator(nn.Module):
         self.GENERATOR = nn.Sequential(
             nn.ConvTranspose2d(noise_size, n_features * 8, 2, 1, 0, bias=True),
             nn.BatchNorm2d(n_features * 8),
-            nn.LeakyReLU(0.05, True),
+            nn.ReLU(True),
             # n_features* 8 x 2 x 2
             nn.ConvTranspose2d(n_features * 8, n_features * 4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(n_features * 4),
-            nn.LeakyReLU(0.05, True),
+            nn.ReLU(True),
             # n_features * 4 x 4 x 4
             nn.ConvTranspose2d(n_features * 4, n_features * 2, 4, 2, 1, bias=True),
             nn.BatchNorm2d(n_features * 2),
-            nn.LeakyReLU(0.05, True),
+            nn.ReLU(True),
             # n_features x 2 x 8 x 8
             nn.ConvTranspose2d(n_features * 2, n_features, 4, 2, 1, bias=False),
             nn.BatchNorm2d(n_features),
-            nn.LeakyReLU(0.05, True),
+            nn.ReLU(True),
             # n_features x 16 x 16
             nn.ConvTranspose2d(n_features, 3, 4, 2, 1, bias=False),
             # 3 x 32 x 32
@@ -113,7 +113,7 @@ class Descriminator(nn.Module):
     
     def __init__(self):
         super(Descriminator, self).__init__()
-        n_features = int(args.ngf)
+        n_features = int(args.ndf)
         self.DESCRIMINATOR = nn.Sequential(
             # input signals 3 x 32 x 32
             nn.Conv2d(3, n_features, 4, 2, 1, bias=False),
